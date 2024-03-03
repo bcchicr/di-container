@@ -1,13 +1,16 @@
 <?php
 
-namespace Bcchicr\StudentList\Container;
+namespace Bcchicr\Container;
 
 use ReflectionClass;
 use Psr\Container\ContainerInterface;
-use Bcchicr\StudentList\Container\Exceptions\DefinitionException;
-use Bcchicr\StudentList\Container\Exceptions\ContainerPrepareException;
-use Bcchicr\StudentList\Container\Exceptions\ContainerResolveException;
-use Bcchicr\StudentList\Container\Exceptions\ContainerNotFoundException;
+use Bcchicr\Container\CallableDefinition;
+use Bcchicr\Container\InstantiableDefinition;
+use Bcchicr\Container\Exceptions\DefinitionException;
+use Bcchicr\Container\Exceptions\ContainerPrepareException;
+use Bcchicr\Container\Exceptions\ContainerResolveException;
+use Bcchicr\Container\Exceptions\ContainerNotFoundException;
+
 
 class Container implements ContainerInterface
 {

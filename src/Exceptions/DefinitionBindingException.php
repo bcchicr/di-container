@@ -1,6 +1,6 @@
 <?php
 
-namespace Bcchicr\StudentList\Container\Exceptions;
+namespace Bcchicr\Container\Exceptions;
 
 class DefinitionBindingException extends DefinitionException
 {

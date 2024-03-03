@@ -1,0 +1,32 @@
+{
+  "name": "bcchicr/di-container",
+  "description": "A minimal PSR-11 compatible Dependency Injection Container with auto-wiring",
+  "keywords": [
+    "psr11",
+    "container",
+    "dependency injection",
+    "psr-11"
+  ],
+  "license": "MIT",
+  "require": {
+    "psr/container": "^2.0",
+    "php": ">=8.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bcchicr\\Container\\": [
+        "src/"
+      ]
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Bcchicr\\Container\\": [
+        "tests/"
+      ]
+    }
+  }
+}

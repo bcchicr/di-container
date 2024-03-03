@@ -1,13 +1,14 @@
 <?php
 
-namespace Bcchicr\StudentList\Container;
+namespace Bcchicr\Container;
 
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
-use Bcchicr\StudentList\Container\Exceptions\ContainerException;
-use Bcchicr\StudentList\Container\Exceptions\ContainerNotFoundException;
-use Bcchicr\StudentList\Container\Exceptions\DefinitionBindingException;
+use Bcchicr\Container\Container;
+use Bcchicr\Container\Exceptions\ContainerException;
+use Bcchicr\Container\Exceptions\DefinitionBindingException;
+
 
 class InstantiableDefinition implements Definition
 {
