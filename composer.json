@@ -8,6 +8,9 @@
     "psr-11"
   ],
   "license": "MIT",
+  "provide": {
+    "psr/container-implementation": "^2.0"
+  },
   "require": {
     "psr/container": "^2.0",
     "php": ">=8.2"
