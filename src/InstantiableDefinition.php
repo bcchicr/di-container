@@ -3,20 +3,29 @@
 namespace Bcchicr\Container;
 
 use ReflectionClass;
-use ReflectionNamedType;
-use ReflectionParameter;
-use Bcchicr\Container\Container;
+use Psr\Container\ContainerInterface;
 use Bcchicr\Container\Exceptions\ContainerException;
 use Bcchicr\Container\Exceptions\DefinitionBindingException;
-
+use Bcchicr\Container\Exceptions\DefinitionConstructException;
+use ReflectionNamedType;
+use ReflectionParameter;
 
 class InstantiableDefinition implements Definition
 {
-    public function __construct(
-        private ReflectionClass $reflection
-    ) {
+    private ReflectionClass $reflection;
+    
+    public function __construct(string $id)
+    {
+        if (!class_exists($id)) {
+            throw new DefinitionConstructException("Unknown class '{$id}'");
+        }
+        $reflection = new ReflectionClass($id);
+        if (!$reflection->isInstantiable()) {
+            throw new DefinitionConstructException("Class '{$id}' is not instantiable");
+        }
+        $this->reflection = $reflection;
     }
-    public function resolve(Container $container): mixed
+    public function resolve(ContainerInterface $container): mixed
     {
         $reflector = $this->reflection;
         $constructor = $reflector->getConstructor();
@@ -27,26 +36,42 @@ class InstantiableDefinition implements Definition
         if (empty($constructParameters)) {
             return $reflector->newInstance();
         }
-        $dependencies = array_map(
-            function ($param) use ($container) {
-                if ($this->isParamResolvable($param)) {
-                    throw new DefinitionBindingException("Cannot resolve dependency '{$param->getName()}' in class '{$param->getDeclaringClass()->getName()}'");
-                }
-                try {
-                    $instance = $container->get($param->getType()->getName());
-                } catch (ContainerException $e) {
-                    $instance = $param->getDefaultValue();
-                }
-                return $instance;
-            },
-            $constructParameters
-        );
+        $dependencies = $this->resolveParameters($container, $constructParameters);
         return $reflector->newInstanceArgs($dependencies);
     }
-    private function isParamResolvable(ReflectionParameter $param): bool
-    {
-        $paramType = $param->getType();
-        return (!$param->isDefaultValueAvailable() &&
-            (!$paramType instanceof ReflectionNamedType || $paramType->isBuiltin()));
+
+    private function resolveParameters(
+        ContainerInterface $container,
+        array $parameters
+    ): array {
+        return array_map(function (
+            ReflectionParameter $param
+        ) use ($container) {
+            if (!$param->getType() instanceof ReflectionNamedType) {
+                return $this->resolveNonTypedParameter($param);
+            }
+            return $this->resolveTypedParameter($container, $param);
+        }, $parameters);
+    }
+    private function resolveNonTypedParameter(
+        ReflectionParameter $param
+    ): object {
+        if ($param->isDefaultValueAvailable()) {
+            return $param->getDefaultValue();
+        }
+        throw new DefinitionBindingException("Cannot resolve non typed dependency '{$param->getName()}' in class '{$param->getDeclaringClass()->getName()}'");
+    }
+    private function resolveTypedParameter(
+        ContainerInterface $container,
+        ReflectionParameter $param
+    ) {
+        try {
+            return $container->get($param->getType()->getName());
+        } catch (ContainerException $e) {
+            if ($param->isDefaultValueAvailable()) {
+                return $param->getDefaultValue();
+            }
+            throw new DefinitionBindingException("Cannot resolve dependency '{$param->getName()}' in class '{$param->getDeclaringClass()->getName()}: {$e->getMessage()}'");
+        }
     }
 }

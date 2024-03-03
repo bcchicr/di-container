@@ -1,6 +1,6 @@
 <?php
 
-namespace Bcchicr\StudentList\Container;
+namespace Bcchicr\Container;
 
 use PHPUnit\Framework\TestCase;
 

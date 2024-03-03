@@ -1,6 +1,6 @@
 <?php
 
-namespace Bcchicr\StudentList\Container;
+namespace Bcchicr\Container;
 
 abstract class NotInstantiable
 {
