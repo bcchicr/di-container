@@ -1,6 +1,6 @@
 <?php
 
-namespace Bcchicr\Container\Exceptions;
+namespace Bcchicr\Container\Exception;
 
 use Exception;
 use Psr\Container\ContainerExceptionInterface;

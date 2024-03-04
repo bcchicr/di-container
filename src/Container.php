@@ -3,11 +3,14 @@
 namespace Bcchicr\Container;
 
 use Psr\Container\ContainerInterface;
-use Bcchicr\Container\CallableDefinition;
-use Bcchicr\Container\Exceptions\DefinitionException;
-use Bcchicr\Container\Exceptions\ContainerResolveException;
-use Bcchicr\Container\Exceptions\ContainerNotFoundException;
-
+use Bcchicr\Container\Definition\Definition;
+use Bcchicr\Container\Definition\AutoWireDefinition;
+use Bcchicr\Container\Exception\ContainerGetException;
+use Bcchicr\Container\Exception\ContainerAutoWireException;
+use Bcchicr\Container\Exception\ContainerNotFoundException;
+use Bcchicr\Container\Definition\Exception\DefinitionException;
+use Bcchicr\Container\Definition\FactoryDefinition;
+use ReflectionClass;
 
 class Container implements ContainerInterface
 {
@@ -16,29 +19,51 @@ class Container implements ContainerInterface
      */
     private array $definitions = [];
 
+    /**
+     * @var mixed[]
+     */
+    private array $instances = [];
+
     public function __construct()
     {
     }
     public function has(string $id): bool
     {
-        return isset($this->definitions[$id]);
+        return isset($this->instances[$id])
+            || isset($this->definitions[$id])
+            || $this->isClassAutoWireable($id);
     }
     public function get(string $id): mixed
     {
         if (!$this->has($id)) {
             throw new ContainerNotFoundException("Undefined dependency '{$id}'");
         }
-        $definition = $this->definitions[$id];
-        try {
-            return $definition->resolve($this);
-        } catch (DefinitionException $e) {
-            throw new ContainerResolveException($e->getMessage());
+        if (isset($this->instances[$id])) {
+            return $this->instances[$id];
         }
+        $definition = $this->getDefinition($id);
+        try {
+            $instance = $definition->resolve($this);
+        } catch (DefinitionException $e) {
+            throw new ContainerGetException($e->getMessage());
+        }
+        return $this->instances[$id] = $instance;
     }
     public function register(
         string $id,
-        callable $value,
+        callable $callback,
     ): void {
-        $this->definitions[$id] = new CallableDefinition($value);
+        $this->definitions[$id] = new FactoryDefinition($id, $callback);
+    }
+    private function isClassAutoWireable(string $class): bool
+    {
+        return class_exists($class) && (new ReflectionClass($class))->isInstantiable();
+    }
+    private function getDefinition(string $id): Definition
+    {
+        if (isset($this->definitions[$id])) {
+            return $this->definitions[$id];
+        }
+        return new AutoWireDefinition($id);
     }
 }

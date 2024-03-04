@@ -1,6 +1,8 @@
 <?php
 
-namespace Bcchicr\Container;
+namespace Bcchicr\Container\Definition;
+
+use Bcchicr\Container\Container;
 
 interface  Definition
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bcchicr\Container\Exceptions;
+namespace Bcchicr\Container\Definition\Exception;
 
 class DefinitionConstructException extends DefinitionException
 {
