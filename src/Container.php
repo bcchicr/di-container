@@ -25,7 +25,7 @@ class Container implements ContainerInterface
 
     public function __construct()
     {
-        $this->instances[$this::class] = $this;
+        $this->instance($this::class, $this);
     }
     public function has(string $id): bool
     {
@@ -54,6 +54,12 @@ class Container implements ContainerInterface
         callable $callback,
     ): void {
         $this->definitions[$id] = new FactoryDefinition($id, $callback);
+    }
+    public function instance(
+        string $id,
+        mixed $instance
+    ): void {
+        $this->instances[$id] = $instance;
     }
     private function isClassAutoWireable(string $class): bool
     {
