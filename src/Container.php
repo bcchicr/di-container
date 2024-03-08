@@ -6,7 +6,6 @@ use Psr\Container\ContainerInterface;
 use Bcchicr\Container\Definition\Definition;
 use Bcchicr\Container\Definition\AutoWireDefinition;
 use Bcchicr\Container\Exception\ContainerGetException;
-use Bcchicr\Container\Exception\ContainerAutoWireException;
 use Bcchicr\Container\Exception\ContainerNotFoundException;
 use Bcchicr\Container\Definition\Exception\DefinitionException;
 use Bcchicr\Container\Definition\FactoryDefinition;
@@ -26,6 +25,7 @@ class Container implements ContainerInterface
 
     public function __construct()
     {
+        $this->instances[$this::class] = $this;
     }
     public function has(string $id): bool
     {
